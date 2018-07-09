@@ -726,3 +726,33 @@ MEMKIND_EXPORT int memkind_get_kind_by_partition(int partition, struct memkind *
     return memkind_get_kind_by_partition_internal(partition, kind);
 }
 
+MEMKIND_EXPORT int memkind_resize_pmem(struct memkind **kind, size_t new_size)
+{
+    struct memkind_pmem *priv = (*kind)->priv;
+    void *addr;
+
+    new_size = roundup(new_size, MEMKIND_PMEM_CHUNK_SIZE);
+    addr = mremap(priv->addr, 0, new_size, 0);
+
+    if (addr == MAP_FAILED)
+    {
+        addr = mremap(priv->addr, 0, new_size, MREMAP_MAYMOVE);
+        if (addr == MAP_FAILED)
+        {
+            log_err("mremap() returned MAP_FAILED.");
+            return 1;
+        }
+    }
+
+    if (ftruncate(priv->fd, new_size) != 0)
+    {
+        log_err("ERROR FTRUNCATE");
+        munmap(addr, new_size);
+        return 2;
+    }
+
+    priv->addr = addr;
+    priv->max_size = new_size;
+
+    return 0;
+}

@@ -165,3 +165,26 @@ TEST_F(MemkindPmemTests, test_TC_MEMKIND_PmemRealloc)
 
     memkind_free(pmem_kind, default_str);
 }
+
+TEST_F(MemkindPmemTests, test_TC_MEMKIND_PmemResize)
+{
+    size_t total_mem = 0;
+    size_t free_mem = 0;
+    size_t new_total_mem = 0;
+    size_t new_free_mem = 0;
+
+    pmem_get_size(pmem_kind, total_mem, free_mem);
+
+    ASSERT_TRUE(total_mem != 0);
+    ASSERT_TRUE(free_mem != 0);
+
+    ASSERT_TRUE(!memkind_resize_pmem(&pmem_kind, 2*MEMKIND_PMEM_MIN_SIZE + 4096));
+
+    pmem_get_size(pmem_kind, new_total_mem, new_free_mem);
+
+    ASSERT_TRUE(new_total_mem != 0);
+    ASSERT_TRUE(new_free_mem != 0);
+    ASSERT_TRUE(new_total_mem > total_mem);
+    ASSERT_TRUE(new_free_mem > free_mem);
+    ASSERT_TRUE(new_total_mem > 2*MEMKIND_PMEM_MIN_SIZE);
+}

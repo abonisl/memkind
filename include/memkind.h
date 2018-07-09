@@ -299,6 +299,10 @@ void *memkind_realloc(memkind_t kind, void *ptr, size_t size);
 /* Free memory allocated with the memkind API */
 void memkind_free(memkind_t kind, void *ptr);
 
+/* ULTRA EXPERIMENTAL API */
+/* Resize pmem kind */
+int memkind_resize_pmem(struct memkind **kind, size_t new_size);
+
 #ifdef __cplusplus
 }
 #endif

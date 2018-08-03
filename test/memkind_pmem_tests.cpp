@@ -404,7 +404,7 @@ TEST_P(MemkindPmemAlignmentTests, test_TC_MEMKIND_PmemAlignment)
             do{
                 ret = memkind_posix_memalign(pmem_kind, &test[i], alignment, GetParam());
             } while(ret == 0 && i++<1000000);
-            printf("%d ", i);
+
             if(j == 0)
                 max = i;
             else

@@ -462,7 +462,7 @@ MEMKIND_EXPORT void *memkind_arena_malloc(struct memkind *kind, size_t size)
     void *result = NULL;
     int err = 0;
     unsigned int arena;
-
+printf("\nmemkind_arena_malloc\n");
     err = kind->ops->get_arena(kind, &arena, size);
     if (MEMKIND_LIKELY(!err)) {
         result = jemk_mallocx_check(size,

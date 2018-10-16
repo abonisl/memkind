@@ -49,7 +49,7 @@ static void* tbb_handle = NULL;
 
 static int load_tbb_symbols()
 {
-    const char so_name[]="libtbbmalloc.so.2";
+    const char so_name[]="libtbbmalloc_debug.so.2";
     tbb_handle = dlopen(so_name, RTLD_LAZY);
     if(!tbb_handle) {
         log_err("%s not found.", so_name);

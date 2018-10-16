@@ -54,6 +54,7 @@ static void set_heap_manager()
 {
     heap_manager_g = &arena_heap_manager_g;
     const char* env = getenv("MEMKIND_HEAP_MANAGER");
+	printf("ENV: %s\n", env);
     if(env && strcmp(env, "TBB") == 0) {
         heap_manager_g = &tbb_heap_manager_g;
     }

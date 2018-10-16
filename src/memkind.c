@@ -445,69 +445,69 @@ void memkind_init(memkind_t kind, bool check_numa)
 
 static void nop(void) {}
 
-static int memkind_create(struct memkind_ops *ops, const char *name,
-                          struct memkind **kind)
-{
-    int err;
-    unsigned int i;
-    unsigned int id_kind = 0;
+// static int memkind_create(struct memkind_ops *ops, const char *name,
+                          // struct memkind **kind)
+// {
+    // int err;
+    // unsigned int i;
+    // unsigned int id_kind = 0;
 
-    *kind = NULL;
-    if (pthread_mutex_lock(&memkind_registry_g.lock) != 0)
-        assert(0 && "failed to acquire mutex");
+    // *kind = NULL;
+    // if (pthread_mutex_lock(&memkind_registry_g.lock) != 0)
+        // assert(0 && "failed to acquire mutex");
 
-    if (memkind_registry_g.num_kind == MEMKIND_MAX_KIND) {
-        log_err("Attempted to initialize more than maximum (%i) number of kinds.",
-                MEMKIND_MAX_KIND);
-        err = MEMKIND_ERROR_TOOMANY;
-        goto exit;
-    }
-    if (ops->create == NULL ||
-        ops->destroy == NULL ||
-        ops->malloc == NULL ||
-        ops->calloc == NULL ||
-        ops->realloc == NULL ||
-        ops->posix_memalign == NULL ||
-        ops->free == NULL ||
-        ops->init_once != NULL) {
-        err = MEMKIND_ERROR_BADOPS;
-        goto exit;
-    }
-    for (i = 0; i < MEMKIND_MAX_KIND; ++i) {
-        if (memkind_registry_g.partition_map[i] == NULL) {
-            id_kind = i;
-            break;
-        } else if (strcmp(name, memkind_registry_g.partition_map[i]->name) == 0) {
-            log_err("Kind with the name %s already exists", name);
-            err = MEMKIND_ERROR_INVALID;
-            goto exit;
-        }
-    }
-    *kind = (struct memkind *)jemk_calloc(1, sizeof(struct memkind));
-    if (!*kind) {
-        err = MEMKIND_ERROR_MALLOC;
-        log_err("jemk_calloc() failed.");
-        goto exit;
-    }
+    // if (memkind_registry_g.num_kind == MEMKIND_MAX_KIND) {
+        // log_err("Attempted to initialize more than maximum (%i) number of kinds.",
+                // MEMKIND_MAX_KIND);
+        // err = MEMKIND_ERROR_TOOMANY;
+        // goto exit;
+    // }
+    // if (ops->create == NULL ||
+        // ops->destroy == NULL ||
+        // ops->malloc == NULL ||
+        // ops->calloc == NULL ||
+        // ops->realloc == NULL ||
+        // ops->posix_memalign == NULL ||
+        // ops->free == NULL ||
+        // ops->init_once != NULL) {
+        // err = MEMKIND_ERROR_BADOPS;
+        // goto exit;
+    // }
+    // for (i = 0; i < MEMKIND_MAX_KIND; ++i) {
+        // if (memkind_registry_g.partition_map[i] == NULL) {
+            // id_kind = i;
+            // break;
+        // } else if (strcmp(name, memkind_registry_g.partition_map[i]->name) == 0) {
+            // log_err("Kind with the name %s already exists", name);
+            // err = MEMKIND_ERROR_INVALID;
+            // goto exit;
+        // }
+    // }
+    // *kind = (struct memkind *)jemk_calloc(1, sizeof(struct memkind));
+    // if (!*kind) {
+        // err = MEMKIND_ERROR_MALLOC;
+        // log_err("jemk_calloc() failed.");
+        // goto exit;
+    // }
 
-    (*kind)->partition = memkind_registry_g.num_kind;
-    err = ops->create(*kind, ops, name);
-    if (err) {
-        jemk_free(*kind);
-        goto exit;
-    }
-    memkind_registry_g.partition_map[id_kind] = *kind;
-    ++memkind_registry_g.num_kind;
+    // (*kind)->partition = memkind_registry_g.num_kind;
+    // err = ops->create(*kind, ops, name);
+    // if (err) {
+        // jemk_free(*kind);
+        // goto exit;
+    // }
+    // memkind_registry_g.partition_map[id_kind] = *kind;
+    // ++memkind_registry_g.num_kind;
 
-    (*kind)->init_once = PTHREAD_ONCE_INIT;
-    pthread_once(&(*kind)->init_once,
-                 nop); //this is done to avoid init_once for dynamic kinds
-exit:
-    if (pthread_mutex_unlock(&memkind_registry_g.lock) != 0)
-        assert(0 && "failed to release mutex");
+    // (*kind)->init_once = PTHREAD_ONCE_INIT;
+    // pthread_once(&(*kind)->init_once,
+                 // nop); //this is done to avoid init_once for dynamic kinds
+// exit:
+    // if (pthread_mutex_unlock(&memkind_registry_g.lock) != 0)
+        // assert(0 && "failed to release mutex");
 
-    return err;
-}
+    // return err;
+// }
 
 #ifdef __GNUC__
 __attribute__((destructor))
@@ -678,90 +678,95 @@ MEMKIND_EXPORT void memkind_free(struct memkind *kind, void *ptr)
 #endif
 }
 
-static int memkind_tmpfile(const char *dir, int *fd)
-{
-    static char template[] = "/memkind.XXXXXX";
-    int err = 0;
-    int oerrno;
-    int dir_len = strlen(dir);
+// static int memkind_tmpfile(const char *dir, int *fd)
+// {
+    // static char template[] = "/memkind.XXXXXX";
+    // int err = 0;
+    // int oerrno;
+    // int dir_len = strlen(dir);
 
-    if (dir_len > PATH_MAX) {
-        return MEMKIND_ERROR_RUNTIME;
-    }
+    // if (dir_len > PATH_MAX) {
+        // return MEMKIND_ERROR_RUNTIME;
+    // }
 
-    char fullname[dir_len + sizeof (template)];
-    (void) strcpy(fullname, dir);
-    (void) strcat(fullname, template);
+    // char fullname[dir_len + sizeof (template)];
+    // (void) strcpy(fullname, dir);
+    // (void) strcat(fullname, template);
 
-    sigset_t set, oldset;
-    sigfillset(&set);
-    (void) sigprocmask(SIG_BLOCK, &set, &oldset);
+    // sigset_t set, oldset;
+    // sigfillset(&set);
+    // (void) sigprocmask(SIG_BLOCK, &set, &oldset);
 
-    if ((*fd = mkstemp(fullname)) < 0) {
-        err = MEMKIND_ERROR_RUNTIME;
-        goto exit;
-    }
+    // if ((*fd = mkstemp(fullname)) < 0) {
+        // err = MEMKIND_ERROR_RUNTIME;
+        // goto exit;
+    // }
 
-    (void) unlink(fullname);
-    (void) sigprocmask(SIG_SETMASK, &oldset, NULL);
+    // (void) unlink(fullname);
+    // (void) sigprocmask(SIG_SETMASK, &oldset, NULL);
 
-    return err;
+    // return err;
 
-exit:
-    oerrno = errno;
-    (void) sigprocmask(SIG_SETMASK, &oldset, NULL);
-    if (*fd != -1) {
-        (void) close(*fd);
-    }
-    *fd = -1;
-    errno = oerrno;
-    return err;
-}
+// exit:
+    // oerrno = errno;
+    // (void) sigprocmask(SIG_SETMASK, &oldset, NULL);
+    // if (*fd != -1) {
+        // (void) close(*fd);
+    // }
+    // *fd = -1;
+    // errno = oerrno;
+    // return err;
+// }
 
 MEMKIND_EXPORT int memkind_create_pmem(const char *dir, size_t max_size,
                                        struct memkind **kind)
 {
-    int err = 0;
-    int oerrno;
+     int err = 0;
+    // int oerrno;
 
-    if (max_size && max_size < MEMKIND_PMEM_MIN_SIZE) {
-        return MEMKIND_ERROR_INVALID;
-    }
+    // if (max_size && max_size < MEMKIND_PMEM_MIN_SIZE) {
+        // return MEMKIND_ERROR_INVALID;
+    // }
 
-    if (max_size) {
-        /* round up to a multiple of jemalloc chunk size */
-        max_size = roundup(max_size, MEMKIND_PMEM_CHUNK_SIZE);
-    }
+    // if (max_size) {
+        // /* round up to a multiple of jemalloc chunk size */
+        // max_size = roundup(max_size, MEMKIND_PMEM_CHUNK_SIZE);
+    // }
 
-    int fd = -1;
-    char name[16];
+    // int fd = -1;
+    // char name[16];
 
-    err = memkind_tmpfile(dir, &fd);
-    if (err) {
+    // err = memkind_tmpfile(dir, &fd);
+    // if (err) {
+        // goto exit;
+    // }
+
+    // snprintf(name, sizeof (name), "pmem%08x", fd);
+
+    *kind = (struct memkind *)jemk_calloc(1, sizeof(struct memkind));
+    if (!*kind) {
+        err = MEMKIND_ERROR_MALLOC;
+        log_err("jemk_calloc() failed.");
         goto exit;
     }
 
-    snprintf(name, sizeof (name), "pmem%08x", fd);
+    (*kind)->init_once = PTHREAD_ONCE_INIT;
+    pthread_once(&(*kind)->init_once,
+                 nop); //this is done to 
+	
+	memkind_default_create(*kind, &MEMKIND_PMEM_OPS, "pmem");
 
-    err = memkind_create(&MEMKIND_PMEM_OPS, name, kind);
-    if (err) {
-        goto exit;
-    }
+    // struct memkind_pmem *priv = (*kind)->priv;
 
-    struct memkind_pmem *priv = (*kind)->priv;
+    // priv->fd = fd;
+    // priv->offset = 0;
+    // priv->max_size = max_size;
 
-    priv->fd = fd;
-    priv->offset = 0;
-    priv->max_size = max_size;
+    memkind_init(*kind, true);
 
     return err;
 
 exit:
-    oerrno = errno;
-    if (fd != -1) {
-        (void) close(fd);
-    }
-    errno = oerrno;
     return err;
 }
 

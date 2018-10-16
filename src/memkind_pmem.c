@@ -228,7 +228,7 @@ MEMKIND_EXPORT int memkind_pmem_destroy(struct memkind *kind)
     pthread_mutex_destroy(&priv->pmem_lock);
 
     (void) close(priv->fd);
-    jemk_free(priv);
+    //jemk_free(priv);
 
     return 0;
 }
